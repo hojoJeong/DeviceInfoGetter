@@ -15,6 +15,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +38,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
 class MainActivity : ComponentActivity() {
@@ -80,7 +82,7 @@ fun DeviceInfoScreen(testInfo: List<DeviceInfoDto>? = null) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("기기 정보") },
+                title = { Text("Device Information") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -88,15 +90,20 @@ fun DeviceInfoScreen(testInfo: List<DeviceInfoDto>? = null) {
             )
         }
     ) { padding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(top = padding.calculateTopPadding())
         ) {
-            items(deviceInfo.size){index ->
-                DeviceInfoItem(deviceInfo[index].label, deviceInfo[index].value)}
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(deviceInfo.size){index ->
+                    DeviceInfoItem(deviceInfo[index].label, deviceInfo[index].value)}
+            }
         }
     }
 }
