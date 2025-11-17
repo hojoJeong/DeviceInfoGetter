@@ -1,6 +1,5 @@
 package com.example.deviceinfogetter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Point
@@ -13,7 +12,6 @@ import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,22 +27,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.example.deviceinfogetter.ui.theme.DeviceInfoGetterTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,12 +69,12 @@ fun DeviceInfoTheme(content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeviceInfoScreen() {
+fun DeviceInfoScreen(testInfo: List<DeviceInfoDto>? = null) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
     val deviceInfo = remember<List<DeviceInfoDto>> {
-        getDeviceInfo(context, configuration)
+        testInfo?: getDeviceInfo(context, configuration)
     }
 
     Scaffold(
@@ -103,8 +96,6 @@ fun DeviceInfoScreen() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(deviceInfo.size){index ->
-                TextField(
-                    value = "index : $index")
                 DeviceInfoItem(deviceInfo[index].label, deviceInfo[index].value)}
         }
     }
@@ -211,4 +202,33 @@ fun getDeviceInfo(context: Context, configuration: Configuration): List<DeviceIn
     infoList.add(DeviceInfoDto("Orientation", orientation))
 
     return infoList
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun DeviceInfoScreenPreview() {
+
+    val testDeviceInfo = listOf(
+        DeviceInfoDto("Device Name", "Galaxy S25"),
+        DeviceInfoDto("Model Name", "SM-S123N"),
+        DeviceInfoDto("Manufacture", "Samsung"),
+        DeviceInfoDto("Resolution", "1080 × 2340 px"),
+        DeviceInfoDto("Density", "3.0x"),
+        DeviceInfoDto("DPI", "480 dpi"),
+        DeviceInfoDto("DPI Category", "XXHDPI (480)"),
+        DeviceInfoDto("Ratio", "19.5:1"),
+        DeviceInfoDto("Display Size (dp)", "360 × 780 dp"),
+        DeviceInfoDto("Display Size Category", "Normal"),
+        DeviceInfoDto("Orientation", "Portrait")
+    )
+
+    DeviceInfoTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            DeviceInfoScreen(testDeviceInfo)
+        }
+    }
 }
