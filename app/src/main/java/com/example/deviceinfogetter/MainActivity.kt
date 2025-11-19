@@ -152,53 +152,52 @@ fun getDeviceInfo(context: Context, configuration: Configuration): List<DeviceIn
         display.getRealMetrics(metrics)
 
         // Resolution
-        infoList.add(DeviceInfoDto("Resolution", "${metrics.widthPixels} × ${metrics.heightPixels} px"))
+        infoList.add(DeviceInfoDto("Resolution", "screen number : $index, ${metrics.widthPixels} × ${metrics.heightPixels} px"))
 
         // DPI
-        infoList.add(DeviceInfoDto("Density", "${metrics.density}x"))
-        infoList.add(DeviceInfoDto("DPI", "${metrics.densityDpi} dpi"))
+        infoList.add(DeviceInfoDto("Density", "screen number : $index, ${metrics.density}x"))
+        infoList.add(DeviceInfoDto("DPI", "screen number : $index, ${metrics.densityDpi} dpi"))
         infoList.add(
-            DeviceInfoDto("DPI Category",
-                    when (metrics.densityDpi) {
-                        in 0..120 -> "LDPI (120)"
-                        in 121..160 -> "MDPI (160)"
-                        in 161..240 -> "HDPI (240)"
-                        in 241..320 -> "XHDPI (320)"
-                        in 321..480 -> "XXHDPI (480)"
-                        in 481..640 -> "XXXHDPI (640)"
-                        else -> "Unknown"
-                    })
+            DeviceInfoDto("DPI Category", "screen number : $index, "
+                + when (metrics.densityDpi) {
+                    in 0..120 -> "LDPI (120)"
+                    in 121..160 -> "MDPI (160)"
+                    in 161..240 -> "HDPI (240)"
+                    in 241..320 -> "XHDPI (320)"
+                    in 321..480 -> "XXHDPI (480)"
+                    in 481..640 -> "XXXHDPI (640)"
+                    else -> "Unknown"
+                }
+            )
         )
+
+        val realSize = Point()
+        val aspectRatio = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
+            val ratio = maxOf(metrics.widthPixels, metrics.heightPixels).toFloat() / minOf(metrics.widthPixels, metrics.heightPixels).toFloat()
+            String.format("%.2f:1", ratio)
+        } else {
+
+            windowManager.defaultDisplay.getRealSize(realSize)
+            val ratio = maxOf(realSize.x, realSize.y).toFloat() / minOf(realSize.x, realSize.y).toFloat()
+            String.format("%.2f:1", ratio)
+        }
+        infoList.add(DeviceInfoDto("Ratio", "screen number : ${index} | $aspectRatio"))
+
+        // Display Size
+        infoList.add(DeviceInfoDto("Display Size (dp)", "screen number : ${index} | ${configuration.screenWidthDp} × ${configuration.screenHeightDp} dp"))
+
+        // Display Size Category
+        val screenSize = configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK
+        val screenSizeText = when (screenSize) {
+            Configuration.SCREENLAYOUT_SIZE_SMALL -> "Small"
+            Configuration.SCREENLAYOUT_SIZE_NORMAL -> "Normal"
+            Configuration.SCREENLAYOUT_SIZE_LARGE -> "Large"
+            Configuration.SCREENLAYOUT_SIZE_XLARGE -> "XLarge"
+            else -> "Undefined"
+        }
+        infoList.add(DeviceInfoDto("Display Size Category", "screen number : ${index} | $screenSizeText"))
     }
-
-    val realSize = Point()
-    val aspectRatio = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
-        val bounds = windowManager.currentWindowMetrics.bounds
-        val ratio = maxOf(bounds.width(), bounds.height()).toFloat() / minOf(bounds.width(), bounds.height()).toFloat()
-        String.format("%.2f:1", ratio)
-    } else {
-
-        windowManager.defaultDisplay.getRealSize(realSize)
-        val ratio = maxOf(realSize.x, realSize.y).toFloat() / minOf(realSize.x, realSize.y).toFloat()
-
-        String.format("%.2f:1", ratio)
-    }
-    infoList.add(DeviceInfoDto("Ratio", aspectRatio))
-
-    // Display Size
-    infoList.add(DeviceInfoDto("Display Size (dp)", "${configuration.screenWidthDp} × ${configuration.screenHeightDp} dp"))
-
-    // Display Size Category
-    val screenSize = configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK
-    val screenSizeText = when (screenSize) {
-        Configuration.SCREENLAYOUT_SIZE_SMALL -> "Small"
-        Configuration.SCREENLAYOUT_SIZE_NORMAL -> "Normal"
-        Configuration.SCREENLAYOUT_SIZE_LARGE -> "Large"
-        Configuration.SCREENLAYOUT_SIZE_XLARGE -> "XLarge"
-        else -> "Undefined"
-    }
-    infoList.add(DeviceInfoDto("Display Size Category", screenSizeText))
 
     // Orientation
     val orientation = when (configuration.orientation) {
@@ -220,11 +219,11 @@ fun DeviceInfoScreenPreview() {
         DeviceInfoDto("Device Name", "Galaxy S25"),
         DeviceInfoDto("Model Name", "SM-S123N"),
         DeviceInfoDto("Manufacture", "Samsung"),
-        DeviceInfoDto("Resolution", "1080 × 2340 px"),
-        DeviceInfoDto("Density", "3.0x"),
-        DeviceInfoDto("DPI", "480 dpi"),
-        DeviceInfoDto("DPI Category", "XXHDPI (480)"),
-        DeviceInfoDto("Ratio", "19.5:1"),
+        DeviceInfoDto("Resolution", "screen number : 0 | 1080 × 2340 px"),
+        DeviceInfoDto("Density", "screen number : 0 | 3.0x"),
+        DeviceInfoDto("DPI", "screen number : 0 | 480 dpi"),
+        DeviceInfoDto("DPI Category", "screen number : 0 | XXHDPI (480)"),
+        DeviceInfoDto("Ratio", "screen number : 0 | 19.5:1"),
         DeviceInfoDto("Display Size (dp)", "360 × 780 dp"),
         DeviceInfoDto("Display Size Category", "Normal"),
         DeviceInfoDto("Orientation", "Portrait")
