@@ -20,19 +20,27 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -43,7 +51,7 @@ import java.io.FileOutputStream
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SquareScreen() {
-    val BOX_SIZE = 200
+    val DEFAULT_BOX_SIZE = 200
     val context = LocalContext.current
     val view = LocalView.current
 
@@ -57,18 +65,41 @@ fun SquareScreen() {
         }
     }
 
+    var boxSize by remember { mutableIntStateOf(DEFAULT_BOX_SIZE) }
+    var boxSizeText by remember { mutableStateOf(DEFAULT_BOX_SIZE.toString()) }
+
     Scaffold {
         ConstraintLayout (
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = Color.Gray)
         ) {
-            val (box, button) = createRefs()
+            val (textField, box, button) = createRefs()
+
+            // Input Box Size
+            TextField(
+                value = boxSizeText,
+                onValueChange = {
+                    boxSizeText = it
+                    it.toIntOrNull()?.let { size -> boxSize = size }
+                },
+                modifier = Modifier
+                    .constrainAs(textField) {
+                        bottom.linkTo(box.top)
+                        start.linkTo(box.start)
+                        end.linkTo(box.end)
+                    }
+                    .padding(bottom = 20.dp),
+                label = { Text("Box Size") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+            )
 
             // Red Box
             Box(
                 modifier = Modifier
-                    .size(BOX_SIZE.dp)
+                    .size(boxSize.dp)
                     .background(color = Color.Red)
                     .constrainAs(box){
                         top.linkTo(parent.top)
@@ -79,7 +110,7 @@ fun SquareScreen() {
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Size : $BOX_SIZE dp",
+                    text = "Size : $boxSize dp",
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
