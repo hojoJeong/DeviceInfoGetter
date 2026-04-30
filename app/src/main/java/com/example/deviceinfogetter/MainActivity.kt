@@ -17,7 +17,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.deviceinfogetter.ui.screen.DeviceInfoScreen
 import com.example.deviceinfogetter.ui.screen.SquareScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @SuppressLint("WrongConstant")
