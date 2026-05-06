@@ -305,6 +305,7 @@ obj/
 .idea/uiDesigner.xml
 .idea/assetWizardSettings.xml
 .idea/gradle.xml
+.idea/kotlinc.xml
 .idea/jarRepositories.xml
 .idea/navEditor.xml
 
