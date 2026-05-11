@@ -13,7 +13,7 @@ Jetpack Compose와 build-logic(Convention Plugin) 학습을 목적으로 합니�
 - 멀티 디스플레이 환경에서 스크린 인덱스별로 정보 표시
 
 ### Square Screen
-- 원하는 dp 값을 입력하면 해당 크기의 빨간 박스를 화면 중앙에 렌더링
+- 원하는 dp 값을 입력하면 해당 크기의 빨간 박스를 화면 중앙에 배치
 - 박스 내부에 현재 dp 크기 표시
 - 스크린샷 저장 기능 (DCIM/Screenshots 폴더)
 
