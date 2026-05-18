@@ -24,6 +24,7 @@ Jetpack Compose와 build-logic(Convention Plugin) 학습을 목적으로 합니�
 - **Navigation**: Navigation Compose (Type-safe)
 - **Layout**: ConstraintLayout for Compose
 - **DI**: Hilt
+- **Serialization**: kotlinx.serialization
 - **Min SDK**: 24 / Target SDK: 35
 
 ## Screens
@@ -84,13 +85,47 @@ Box(modifier = Modifier.constrainAs(box) {
 
 ### 사이드 이펙트 & CompositionLocal
 
-- `rememberLauncherForActivityResult`로 런타임 권한 요청 결과 처리
-- `LocalContext.current`, `LocalView.current`로 Composition 트리에서 Android 컨텍스트 접근
+- `LaunchedEffect(Unit)` — 화면 진입 시 `FocusRequester`를 통해 TextField에 자동 포커스
+- `DisposableEffect(lifecycleOwner)` — `LifecycleEventObserver`를 등록하고 `onDispose`에서 해제
+- `rememberLauncherForActivityResult` — 런타임 권한 요청 결과 처리
+- `rememberCoroutineScope()` + `SnackbarHostState` — 스크린샷 저장 후 Snackbar 표시
+- `LocalContext.current`, `LocalView.current`, `LocalLifecycleOwner.current`로 Composition 트리에서 Android 컨텍스트 접근
 
 ### Preview
 
 - `@Preview(showBackground = true, showSystemUi = true)`로 Android Studio에서 UI 확인
 - 상태 호이스팅 덕분에 ViewModel 없이 더미 데이터만으로 `DeviceInfoContent` 프리뷰 가능
+
+## Testing
+
+### Unit Test
+
+- `DeviceInfoViewModelTest` — Repository를 fake로 주입해 ViewModel의 상태 초기화 검증
+- `SquareViewModelTest` — `boxSize`, `boxSizeText` 상태 변화 및 경계값(비정수 입력) 검증
+- `DeviceInfoMapperTest` — DPI 카테고리, 화면 방향 등 변환 함수 단위 검증
+- `kotlinx-coroutines-test` + JUnit4 기반
+
+### UI Test (Instrumented)
+
+- `DeviceInfoScreenTest`, `DeviceInfoItemTest` — Compose UI 렌더링 및 버튼 클릭 동작 검증
+- `SquareScreenTest` — 박스 크기 입력·변경 시 UI 업데이트 검증
+- Hilt 연동: `@HiltAndroidTest` + `@UninstallModules` + `@BindValue`로 테스트용 Repository 주입
+- `HiltTestRunner`로 instrumented test runner 교체
+
+```kotlin
+@HiltAndroidTest
+@UninstallModules(RepositoryModule::class)
+@RunWith(AndroidJUnit4::class)
+class DeviceInfoScreenTest {
+    @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
+    @get:Rule(order = 1) val composeRule = createAndroidComposeRule<HiltTestActivity>()
+
+    @BindValue @JvmField
+    val fakeDeviceInfoRepository: DeviceInfoRepository = object : DeviceInfoRepository {
+        override fun getDeviceInfo() = listOf(DeviceInfoDto("Model Name", "Galaxy S25"))
+    }
+}
+```
 
 ## build-logic (Convention Plugin)
 
